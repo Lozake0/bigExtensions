@@ -6,13 +6,11 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.SMangaUpdate
-import eu.kanade.tachiyomi.util.asJsoup
 import keiyoushi.annotation.Source
 import keiyoushi.network.get
 import keiyoushi.network.post
 import keiyoushi.network.rateLimit
 import keiyoushi.source.KeiSource
-import keiyoushi.utils.extractNextJs
 import keiyoushi.utils.firstInstanceOrNull
 import keiyoushi.utils.long
 import keiyoushi.utils.parseAs
@@ -20,7 +18,6 @@ import keiyoushi.utils.toJsonRequestBody
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -76,17 +73,27 @@ abstract class LycanToons : KeiSource() {
         fetchChapters: Boolean,
     ): SMangaUpdate = coroutineScope {
         val slug = manga.url.substringAfterLast('/')
-        val details = if (fetchDetails) async { fetchDetails(slug) } else null
+        val details = if (fetchDetails) async { fetchDetails(slug, manga.title) } else null
         val chapterList = if (fetchChapters) async { fetchChapters(slug).map { it.toSChapter(slug) } } else null
 
         SMangaUpdate(details?.await() ?: manga, chapterList?.await() ?: chapters)
     }
 
-    private suspend fun fetchDetails(slug: String): SManga = client.get("$baseUrl/series/$slug").asJsoup()
-        .extractNextJs<SeriesPageDto> { it is JsonObject && "obra" in it && "chapters" in it }
-        ?.obra
-        ?.toSManga()
-        ?: throw IOException("Obra não encontrada")
+    private suspend fun fetchDetails(slug: String, title: String? = null): SManga {
+        val words = slug.split('-')
+        val queries = listOfNotNull(title) + (words.size downTo 1).map { words.take(it).joinToString(" ") }
+
+        for (query in queries.distinct()) {
+            val body = SeriesRequestDto(page = 1, limit = PAGE_SIZE, search = query)
+            val match = client.post("$baseUrl/api/series", body.toJsonRequestBody()).parseAs<SeriesListDto>()
+                .series
+                .firstOrNull { it.slug == slug }
+
+            if (match != null) return match.toSManga()
+        }
+
+        throw IOException("Obra não encontrada")
+    }
 
     // Entries saved before 1.6.2 keep the "/series/" prefix.
     override fun getMangaUrl(manga: SManga): String = "$baseUrl/series/${manga.url.substringAfterLast('/')}"

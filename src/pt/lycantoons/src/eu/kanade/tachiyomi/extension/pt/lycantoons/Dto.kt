@@ -36,28 +36,7 @@ class PaginationDto(
 
 @Serializable
 class SeriesDto(
-    private val slug: String,
-    private val title: String,
-    private val coverUrl: String? = null,
-    private val seriesType: String? = null,
-) {
-    val isNovel get() = seriesType == "NOVEL"
-
-    fun toSManga() = SManga.create().apply {
-        url = slug
-        title = this@SeriesDto.title
-        thumbnail_url = coverUrl?.takeIf(String::isNotBlank)
-    }
-}
-
-@Serializable
-class SeriesPageDto(
-    val obra: SeriesDetailsDto,
-)
-
-@Serializable
-class SeriesDetailsDto(
-    private val slug: String,
+    val slug: String,
     private val title: String,
     @SerialName("original_title") private val originalTitle: String? = null,
     private val description: String? = null,
@@ -68,14 +47,16 @@ class SeriesDetailsDto(
     private val genre: List<String> = emptyList(),
     private val seriesType: String? = null,
 ) {
+    val isNovel get() = seriesType == "NOVEL"
+
     fun toSManga() = SManga.create().apply {
         url = slug
-        title = this@SeriesDetailsDto.title
+        title = this@SeriesDto.title
         thumbnail_url = coverUrl?.takeIf(String::isNotBlank)
-        author = this@SeriesDetailsDto.author.known()
-        artist = this@SeriesDetailsDto.artist.known()
+        author = this@SeriesDto.author.known()
+        artist = this@SeriesDto.artist.known()
         description = buildString {
-            this@SeriesDetailsDto.description?.takeIf(String::isNotBlank)?.let(::append)
+            this@SeriesDto.description?.takeIf(String::isNotBlank)?.let(::append)
             originalTitle?.takeIf { it.isNotBlank() && it != title }?.let {
                 if (isNotEmpty()) append("\n\n")
                 append("Título original: $it")
@@ -83,9 +64,9 @@ class SeriesDetailsDto(
         }.takeIf(String::isNotEmpty)
         genre = buildList {
             seriesType?.let { add(it.lowercase().replaceFirstChar(Char::uppercase)) }
-            this@SeriesDetailsDto.genre.mapTo(this) { GENRES[it] ?: it }
+            this@SeriesDto.genre.mapTo(this) { GENRES[it] ?: it }
         }.distinct().joinToString()
-        status = when (this@SeriesDetailsDto.status) {
+        status = when (this@SeriesDto.status) {
             "ONGOING" -> SManga.ONGOING
             "COMPLETED" -> SManga.COMPLETED
             "HIATUS" -> SManga.ON_HIATUS
