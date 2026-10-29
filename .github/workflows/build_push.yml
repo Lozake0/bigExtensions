@@ -29,6 +29,7 @@ jobs:
     outputs:
       matrix: ${{ steps.generate-matrices.outputs.matrix }}
       delete: ${{ steps.generate-matrices.outputs.delete }}
+      base: ${{ steps.shas.outputs.base }}
     steps:
       - name: Checkout main branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -45,6 +46,7 @@ jobs:
           printf '%s' "$CI_SCRIPTS" | base64 --decode | tar -xz -C .github/scripts
 
       - name: Get last successful CI commit
+        id: shas
         uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
         with:
           fallback-sha: 4b825dc642cb6eb9a060e54bf8d69288fbee4904 # empty tree
@@ -134,6 +136,7 @@ jobs:
         with:
           ref: main
           path: main
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Load publishing scripts
@@ -153,6 +156,7 @@ jobs:
           persist-credentials: true
 
       - name: Publish and deploy repo
+        id: deploy
         env:
           DELETE: ${{ needs.prepare.outputs.delete }}
           GH_TOKEN: ${{ github.token }}
@@ -167,6 +171,75 @@ jobs:
             git add .
             git commit -m "Update extensions repo"
             git push
+            echo "published=true" >> "$GITHUB_OUTPUT"
           else
             echo "No changes to commit"
           fi
+
+      # The repo is already published at this point, so a Discord outage must not fail the run.
+      - name: Announce on Discord
+        if: steps.deploy.outputs.published == 'true'
+        continue-on-error: true
+        working-directory: main
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          BASE: ${{ needs.prepare.outputs.base }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "DISCORD_WEBHOOK not set, skipping"
+            exit 0
+          fi
+          python3 - <<'EOF'
+          import json, os, re, subprocess, urllib.request
+
+          # Same paths that trigger this workflow, so CI-only commits stay out of the announcement.
+          def log(revs):
+              return subprocess.run(
+                  ["git", "log", "--no-merges", "--reverse", "--format=%H%x1f%s%x1f%b%x1e", *revs,
+                   "--", ".", ":!.github", ":!*.md"],
+                  capture_output=True, text=True, encoding="utf-8", check=True,
+              ).stdout
+
+          # Everything since the last successful run. Without one, nx-set-shas hands back the empty
+          # tree, which git would read as "the whole history", so fall back to HEAD alone.
+          base = os.environ.get("BASE", "")
+          has_base = base and subprocess.run(["git", "cat-file", "-e", base + "^{commit}"], capture_output=True).returncode == 0
+          out = log([base + "..HEAD"] if has_base else ["-1"])
+
+          embeds = []
+          for entry in filter(None, (e.strip("\n") for e in out.split("\x1e"))):
+              sha, subject, body = entry.split("\x1f")
+              # Commit bodies are wrapped at 72 columns; Discord should reflow them.
+              paragraphs = [re.sub(r"\n(?![-*] )", " ", p.strip()) for p in re.split(r"\n\s*\n", body) if p.strip()]
+              embed = {"title": subject[:256], "url": f"{os.environ['REPO_URL']}/commit/{sha}", "color": 0x2563EB}
+              if paragraphs:
+                  embed["description"] = "\n\n".join(paragraphs)[:4096]
+              embeds.append(embed)
+
+          if not embeds:
+              print("No extension commits to announce")
+              raise SystemExit
+
+          # A message holds at most 10 embeds and 6000 characters across them.
+          batches, size = [[]], 0
+          for embed in embeds:
+              length = len(embed["title"]) + len(embed.get("description", ""))
+              if batches[-1] and (len(batches[-1]) == 10 or size + length > 6000):
+                  batches.append([])
+                  size = 0
+              batches[-1].append(embed)
+              size += length
+
+          for index, batch in enumerate(batches):
+              payload = {"embeds": batch, "allowed_mentions": {"parse": []}}
+              if index == 0:
+                  payload["content"] = "**Novas atualizações no repositório**"
+              request = urllib.request.Request(
+                  os.environ["DISCORD_WEBHOOK"] + "?wait=true",
+                  data=json.dumps(payload).encode(),
+                  # Discord rejects the default Python user agent.
+                  headers={"Content-Type": "application/json", "User-Agent": f"DiscordBot ({os.environ['REPO_URL']}, 1)"},
+              )
+              urllib.request.urlopen(request, timeout=30).read()
+          EOF
