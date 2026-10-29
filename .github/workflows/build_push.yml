@@ -176,7 +176,6 @@ jobs:
             echo "No changes to commit"
           fi
 
-      # The repo is already published at this point, so a Discord outage must not fail the run.
       - name: Announce on Discord
         if: steps.deploy.outputs.published == 'true'
         continue-on-error: true
