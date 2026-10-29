@@ -1,6 +1,10 @@
-# bigExtensions
+<h1 align="center">bigExtensions</h1>
 
-Manga sources for [Mihon](https://mihon.app) and forks.
+<p align="center">Manga sources for <a href="https://mihon.app">Mihon</a> and forks.</p>
+
+<p align="center">
+  <a href="https://discord.gg/GZvyZ3zCHV"><img alt="Discord" src="https://img.shields.io/badge/Discord-join%20the%20server-5865F2?logo=discord&logoColor=white"></a>
+</p>
 
 ## Install
 
@@ -49,7 +53,7 @@ If a source is broken and you know why but do not want to write the fix, say so 
 
 ## Support
 
-Issues are the best place for anything about a source, since it stays searchable for whoever hits the same problem later. For everything else, reach me here:
+Issues are the best place for anything about a source, since it stays searchable for whoever hits the same problem later. For everything else, join the [Discord server](https://discord.gg/GZvyZ3zCHV) or reach me here:
 
 <p align="left">
   <a href="https://discord.com/users/1254123038656430189">
