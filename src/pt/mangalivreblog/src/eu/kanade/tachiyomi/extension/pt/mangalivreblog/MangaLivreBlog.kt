@@ -19,6 +19,7 @@ import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
@@ -107,11 +108,41 @@ abstract class MangaLivreBlog : KeiSource() {
 
         return SMangaUpdate(
             manga = document.toSManga(manga.url),
-            chapters = document.select("ul.chapters-list li.chapter-item a.chapter-link")
-                .mapNotNull(::toSChapterOrNull)
-                .disambiguated()
-                .sortedByDescending(SChapter::chapter_number),
+            chapters = if (fetchChapters) {
+                document.chapterLinks()
+                    .mapNotNull(::toSChapterOrNull)
+                    .disambiguated()
+                    .sortedByDescending(SChapter::chapter_number)
+            } else {
+                chapters
+            },
         )
+    }
+
+    /**
+     * The page only renders the newest 30 chapters; the rest come from the REST API in batches
+     * of 30, which is what the "Carregar mais capítulos" button calls.
+     */
+    private suspend fun Document.chapterLinks(): List<Element> {
+        val links = select(CHAPTER_SELECTOR).toMutableList()
+        val loadMore = selectFirst("#sr-load-chapters") ?: return links
+        val mangaId = loadMore.attr("data-manga").takeIf(String::isNotBlank) ?: return links
+        var offset = loadMore.attr("data-offset").toIntOrNull() ?: return links
+        var total = loadMore.attr("data-total").toIntOrNull() ?: return links
+
+        while (offset < total) {
+            val url = "$baseUrl/wp-json/slimeread/v1/chapters/$mangaId".toHttpUrl().newBuilder()
+                .addQueryParameter("offset", offset.toString())
+                .build()
+            val page = client.get(url).parseAs<ChapterPageDto>()
+
+            links += Jsoup.parseBodyFragment(page.list, baseUrl).select(CHAPTER_SELECTOR)
+            if (page.offset <= offset) break
+            offset = page.offset
+            total = page.total
+        }
+
+        return links
     }
 
     /**
@@ -195,6 +226,7 @@ abstract class MangaLivreBlog : KeiSource() {
     override fun getChapterUrl(chapter: SChapter): String = baseUrl + chapter.url
 
     companion object {
+        private const val CHAPTER_SELECTOR = "li.chapter-item a.chapter-link"
         private val CHAPTER_NUMBER_REGEX = Regex("""\d+(?:\.\d+)?""")
         private val REPEATED_LABEL_REGEX = Regex("""^(.+?):\s*\1$""")
     }
