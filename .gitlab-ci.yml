@@ -66,7 +66,8 @@ prepare:
 
 build:
   stage: build
-  image: eclipse-temurin:17-jdk
+  # Ships the Android SDK with licenses accepted; AGP fetches the compileSdk platform it lacks.
+  image: ghcr.io/cirruslabs/android-sdk:36
   needs: [prepare]
   timeout: 30m
   variables:
