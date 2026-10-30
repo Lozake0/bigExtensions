@@ -113,7 +113,8 @@ def batches(embeds):
 def send(embeds, owner):
     payload = {
         "username": REPO.split("/")[1],
-        "avatar_url": owner.get("avatar_url"),
+        # GitLab gives the owner's avatar as a path, which Discord rejects with a 400.
+        "avatar_url": owner.get("avatar_url") and urllib.parse.urljoin(REPO_URL, owner["avatar_url"]),
         "embeds": embeds,
         "allowed_mentions": {"parse": []},
     }
