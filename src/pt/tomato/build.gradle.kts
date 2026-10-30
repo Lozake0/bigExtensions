@@ -6,12 +6,12 @@ plugins {
 
 keiyoushi {
     name = "Tomato"
-    versionCode = 2
+    versionCode = 3
     contentWarning = ContentWarning.MIXED
     libVersion = "1.6"
 
     source {
         lang = "pt-BR"
-        baseUrl = "https://biglongs0.github.io/bigExtensions/tomato"
+        baseUrl = "https://biglongs1.gitlab.io/bigExtensions/tomato"
     }
 }
