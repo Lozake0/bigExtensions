@@ -1,0 +1,126 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - src/**/*
+        - lib/**/*
+        - lib-multisrc/**/*
+        - core/**/*
+        - common/**/*
+        - compiler/**/*
+        - gradle/**/*
+        - docs/**/*
+        - "*.gradle.kts"
+        - gradle.properties
+        - .gitlab-ci.yml
+        - .gitlab/discord_announce.py
+  auto_cancel:
+    on_new_commit: interruptible
+
+stages:
+  - prepare
+  - build
+  - publish
+
+variables:
+  CI_SCRIPTS_PROJECT: $CI_PROJECT_NAMESPACE/bigExtensions-ci
+
+default:
+  interruptible: true
+
+.load-scripts:
+  script:
+    - git clone --quiet --depth 1 "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_SCRIPTS_PROJECT}.git" .gitlab/scripts
+
+prepare:
+  stage: prepare
+  image: python:3.13
+  timeout: 10m
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - !reference [.load-scripts, script]
+    # The site records the commit it was built from, so a failed run is retried by the next one.
+    - BASE=$(curl -fsS "$CI_PAGES_URL/ci-sha" || true)
+    - git cat-file -e "$BASE^{commit}" 2>/dev/null || BASE=4b825dc642cb6eb9a060e54bf8d69288fbee4904 # empty tree
+    - echo "BASE=$BASE" > prepare.env
+    - GITHUB_OUTPUT=matrices.txt python .gitlab/scripts/generate-build-matrices.py "$BASE"
+    - |
+      python - <<'EOF'
+      import json
+      outputs = dict(line.split("=", 1) for line in open("matrices.txt").read().splitlines())
+      chunks = json.loads(outputs["matrix"])["chunk"]
+      open("modules.txt", "w").write(" ".join(module for chunk in chunks for module in chunk["modules"]))
+      open("delete.json", "w").write(outputs["delete"])
+      EOF
+  artifacts:
+    paths:
+      - modules.txt
+      - delete.json
+    reports:
+      dotenv: prepare.env
+    expire_in: 1 day
+
+build:
+  stage: build
+  image: eclipse-temurin:17-jdk
+  needs: [prepare]
+  timeout: 30m
+  variables:
+    GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle-home
+  cache:
+    key: gradle
+    paths:
+      - .gradle-home/caches/
+      - .gradle-home/wrapper/
+  script:
+    - MODULES=$(cat modules.txt)
+    - if [ -z "$MODULES" ]; then echo "Nothing to build"; exit 0; fi
+    - echo "$SIGNING_KEY" | base64 -d > signingkey.jks
+    # Signing with another key would force every user to reinstall, so refuse it up front.
+    - FINGERPRINT=$(keytool -list -v -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -alias "$ALIAS" | sed -n 's/^\s*SHA256:\s*//p' | head -n 1 | tr -d ':' | tr 'A-F' 'a-f')
+    - '[ "$FINGERPRINT" = "$SIGNING_KEY_FINGERPRINT" ] || { echo "signingkey.jks does not match SIGNING_KEY_FINGERPRINT"; exit 1; }'
+    - ./gradlew $(for module in $MODULES; do printf '%s:assembleRelease ' "$module"; done)
+  after_script:
+    - rm -f signingkey.jks
+  artifacts:
+    paths:
+      - "**/build/outputs/apk/release/*.apk"
+      - "**/build/outputs/jar/release/*.jar"
+      - "**/build/keiyoushi-source-info.json"
+    expire_in: 1 day
+
+pages:
+  stage: publish
+  image: python:3.13
+  needs: [prepare, build]
+  resource_group: pages
+  interruptible: false
+  timeout: 1h
+  variables:
+    GIT_DEPTH: 0
+    ARTIFACTS_DIR: $CI_PROJECT_DIR
+  script:
+    - !reference [.load-scripts, script]
+    - pip install --quiet protobuf
+    - mkdir public
+    # publish-repo.py merges into the published index, so start from the files that are live now.
+    - for file in index.json release-assets.json; do curl -fsS "$CI_PAGES_URL/$file" -o "public/$file" || rm -f "public/$file"; done
+    - cp public/index.json published-index.json 2>/dev/null || touch published-index.json
+    - (cd public && python -u ../.gitlab/scripts/publish-repo.py "$(cat ../delete.json)" "$CI_COMMIT_SHA")
+    - cp -r docs/. public/
+    - echo "$CI_COMMIT_SHA" > public/ci-sha
+    - |
+      if cmp -s published-index.json public/index.json; then
+        echo "Index unchanged, nothing to announce"
+      elif [ -z "$DISCORD_WEBHOOK" ]; then
+        echo "DISCORD_WEBHOOK not set, skipping"
+      else
+        python .gitlab/discord_announce.py || echo "Discord announcement failed"
+      fi
+  artifacts:
+    paths:
+      - public

@@ -2,11 +2,13 @@ import json
 import os
 import re
 import subprocess
+import urllib.parse
 import urllib.request
 
-REPO = os.environ["GITHUB_REPOSITORY"]
-REPO_URL = f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{REPO}"
-API_URL = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+REPO = os.environ["CI_PROJECT_PATH"]
+REPO_URL = os.environ["CI_PROJECT_URL"]
+API_URL = os.environ.get("CI_API_V4_URL", "https://gitlab.com/api/v4")
+PROJECT_ID = os.environ["CI_PROJECT_ID"]
 
 COLORS = {"added": 0x2EA043, "removed": 0xDA3633, "updated": 0x1F6FEB}
 
@@ -16,14 +18,11 @@ def git(*args):
 
 
 def api(path):
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": REPO}
-    if os.environ.get("GH_TOKEN"):
-        headers["Authorization"] = f"Bearer {os.environ['GH_TOKEN']}"
     try:
-        with urllib.request.urlopen(urllib.request.Request(f"{API_URL}/{path}", headers=headers), timeout=30) as response:
+        with urllib.request.urlopen(urllib.request.Request(f"{API_URL}/{path}", headers={"User-Agent": REPO}), timeout=30) as response:
             return json.load(response)
     except Exception as error:
-        print(f"GitHub API {path}: {error}")
+        print(f"GitLab API {path}: {error}")
         return {}
 
 
@@ -31,8 +30,8 @@ def commits():
     base = os.environ.get("BASE", "")
     has_base = base and subprocess.run(["git", "cat-file", "-e", f"{base}^{{commit}}"], capture_output=True).returncode == 0
     out = git(
-        "log", "--no-merges", "--reverse", "--format=%H%x1f%an%x1f%aI%x1f%s%x1f%b%x1e",
-        f"{base}..HEAD" if has_base else "-1", "--", ".", ":!.github", ":!*.md",
+        "log", "--no-merges", "--reverse", "--format=%H%x1f%an%x1f%ae%x1f%aI%x1f%s%x1f%b%x1e",
+        f"{base}..HEAD" if has_base else "-1", "--", ".", ":!.gitlab", ":!.gitlab-ci.yml", ":!*.md",
     )
     return [entry.strip("\n").split("\x1f") for entry in out.split("\x1e") if entry.strip("\n")]
 
@@ -77,13 +76,13 @@ def reflow(body):
     return "\n\n".join(paragraphs)[:4096]
 
 
-def embed(sha, author_name, date, subject, body):
-    author = api(f"repos/{REPO}/commits/{sha}").get("author") or {}
+def embed(sha, author_name, author_email, date, subject, body):
+    avatar = api(f"avatar?email={urllib.parse.quote(author_email)}").get("avatar_url")
     fields, kind = extension_fields(sha)
     embed = {
-        "author": {"name": author.get("login") or author_name, "url": author.get("html_url"), "icon_url": author.get("avatar_url")},
+        "author": {"name": author_name, "icon_url": avatar},
         "title": f"[{REPO}] {subject}"[:256],
-        "url": f"{REPO_URL}/commit/{sha}",
+        "url": f"{REPO_URL}/-/commit/{sha}",
         "description": reflow(body),
         "fields": fields,
         "color": COLORS[kind],
@@ -131,7 +130,8 @@ def main():
     if not embeds:
         print("No extension commits to announce")
         return
-    owner = api(f"repos/{REPO}").get("owner") or {}
+    project = api(f"projects/{PROJECT_ID}")
+    owner = project.get("owner") or project.get("namespace") or {}
     for group in batches(embeds):
         send(group, owner)
     print(f"Announced {len(embeds)} commit(s)")
