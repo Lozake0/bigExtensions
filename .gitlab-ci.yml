@@ -84,6 +84,8 @@ build:
     # Signing with another key would force every user to reinstall, so refuse it up front.
     - FINGERPRINT=$(keytool -list -v -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -alias "$ALIAS" | sed -n 's/^\s*SHA256:\s*//p' | head -n 1 | tr -d ':' | tr 'A-F' 'a-f')
     - '[ "$FINGERPRINT" = "$SIGNING_KEY_FINGERPRINT" ] || { echo "signingkey.jks does not match SIGNING_KEY_FINGERPRINT"; exit 1; }'
+    # signingkey.jks is PKCS12, which protects its key with the store password.
+    - export KEY_PASSWORD="$KEY_STORE_PASSWORD"
     - ./gradlew $(for module in $MODULES; do printf '%s:assembleRelease ' "$module"; done)
   after_script:
     - rm -f signingkey.jks
