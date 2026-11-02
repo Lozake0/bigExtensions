@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.extension.pt.acervoeremita
 
 import eu.kanade.tachiyomi.source.model.SManga
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -51,8 +52,15 @@ class ChapterDto(
 
 @Serializable
 class ReaderDto(
+    val work: ReaderWorkDto,
     val chapter: ReaderChapterDto,
     val pages: List<PageDto>,
+)
+
+@Serializable
+class ReaderWorkDto(
+    val workId: Long,
+    val name: String,
 )
 
 @Serializable
@@ -83,4 +91,15 @@ class GenreDto(
 @Serializable
 class TagDto(
     val name: String,
+)
+
+@Serializable
+class OriginSearchDto(
+    @SerialName("obras") val works: List<OriginWorkDto> = emptyList(),
+)
+
+@Serializable
+class OriginWorkDto(
+    @SerialName("obr_id") val id: Long,
+    @SerialName("obr_nome") val name: String,
 )

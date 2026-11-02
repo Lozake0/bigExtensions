@@ -28,22 +28,30 @@ import okhttp3.Response
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
+import java.text.Normalizer
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Instant
 
 @Source
 abstract class AcervoEremita : KeiSource() {
+
+    private val originIds = ConcurrentHashMap<Long, Long>()
 
     override fun OkHttpClient.Builder.configureClient(): OkHttpClient.Builder = rateLimit(3) { it.host == baseUrl.toHttpUrl().host }
         .addInterceptor(::fallbackImage)
 
     private fun fallbackImage(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val fallback = request.url.fragment?.takeIf { request.url.host == STORAGE_HOST } ?: return chain.proceed(request)
-        val response = chain.proceed(request)
-        if (response.isSuccessful) return response
+        val fallbacks = request.url.fragment?.takeIf { request.url.host == STORAGE_HOST }?.split(FALLBACK_SEPARATOR) ?: return chain.proceed(request)
+        var response = chain.proceed(request)
 
-        response.close()
-        return chain.proceed(request.newBuilder().url(baseUrl + fallback).build())
+        for (fallback in fallbacks) {
+            if (response.isSuccessful) break
+            response.close()
+            response = chain.proceed(request.newBuilder().url(fallback).build())
+        }
+
+        return response
     }
 
     override suspend fun getPopularManga(page: Int): MangasPage {
@@ -154,16 +162,52 @@ abstract class AcervoEremita : KeiSource() {
         val reader = fetchRsc("${getChapterUrl(chapter)}&page=1").extractNextJsRsc<ReaderDto>() ?: throw IOException("Capítulo não encontrado")
         val expected = chapter.memo[MEMO_CHAPTER_ID]?.long
         if (expected != null && expected != reader.chapter.chapterId) throw IOException("Capítulo não encontrado")
+        val originId = originId(reader.work)
 
         return reader.pages
             .sortedBy(PageDto::pageNumber)
-            .mapIndexed { index, page -> Page(index, imageUrl = "${page.storageUrl()}#${page.imageUrl}") }
+            .mapIndexed { index, page -> Page(index, imageUrl = page.imageUrl(reader.work.workId, originId)) }
     }
 
-    private fun PageDto.storageUrl(): String = when {
-        imageSrc.startsWith("/") || imageSrc.startsWith("manga_") -> "https://$STORAGE_HOST/wp-content/uploads/WP-manga/data/${imageSrc.trimStart('/')}"
-        else -> "https://$STORAGE_HOST$imagePathReader"
+    private fun PageDto.imageUrl(workId: Long, originId: Long): String {
+        val storageUrl = when {
+            imageSrc.startsWith("/") || imageSrc.startsWith("manga_") -> "https://$STORAGE_HOST/wp-content/uploads/WP-manga/data/${imageSrc.trimStart('/')}"
+            else -> "https://$STORAGE_HOST$imagePathReader"
+        }
+        val fallbacks = listOfNotNull(
+            storageUrl.replace("/obras/$workId/", "/obras/$originId/").takeIf { it != storageUrl },
+            baseUrl + imageUrl,
+        )
+
+        return "$storageUrl#${fallbacks.joinToString(FALLBACK_SEPARATOR)}"
     }
+
+    private suspend fun originId(work: ReaderWorkDto): Long = originIds.getOrPut(work.workId) { findOriginId(work.name) ?: work.workId }
+
+    private suspend fun findOriginId(name: String): Long? {
+        val url = "$ORIGIN_API/obras/buscar".toHttpUrl().newBuilder()
+            .addQueryParameter("pagina", "1")
+            .addQueryParameter("limite", "26")
+            .addQueryParameter("busca", name)
+            .addQueryParameter("todos_generos", "1")
+            .build()
+        val originHeaders = Headers.Builder()
+            .set("User-Agent", headers["User-Agent"].orEmpty())
+            .set("Accept", "application/json")
+            .set("scan-id", "1")
+            .build()
+
+        return client.get(url, originHeaders, ensureSuccess = false).use { response ->
+            if (!response.isSuccessful) return null
+            response.body.string().parseAs<OriginSearchDto>().works.firstOrNull { it.name.normalized() == name.normalized() }?.id
+        }
+    }
+
+    private fun String.normalized(): String = Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace(DIACRITICS, "")
+        .lowercase()
+        .replace(NON_ALPHANUMERIC, " ")
+        .trim()
 
     private suspend fun fetchRsc(url: String): String = client.get(url, Headers.Builder().addAll(headers).set("RSC", "1").build()).body.string()
 
@@ -197,6 +241,10 @@ abstract class AcervoEremita : KeiSource() {
         private const val CHAPTER_PAGE_SIZE = 80
         private const val MEMO_CHAPTER_ID = "chapterId"
         private const val STORAGE_HOST = "cdn.verdinha.wtf"
+        private const val ORIGIN_API = "https://api.vegitoons.black"
+        private const val FALLBACK_SEPARATOR = "|"
+        private val DIACRITICS = Regex("""\p{Mn}+""")
+        private val NON_ALPHANUMERIC = Regex("""[^a-z0-9]+""")
         private val WORK_ID = Regex("""WorkScreen_(\d+)""")
     }
 }
