@@ -139,7 +139,7 @@ abstract class AkaitoMangas : KeiSource() {
 
         return SMangaUpdate(
             manga = if (fetchDetails) page.project.toSManga(manga.url) else manga,
-            chapters = if (fetchChapters) page.toSChapters(manga.url) else chapters,
+            chapters = if (fetchChapters) page.toSChapters(manga.url).dropUnpublished() else chapters,
         )
     }
 
@@ -157,13 +157,18 @@ abstract class AkaitoMangas : KeiSource() {
         }
         .sortedByDescending(SChapter::chapter_number)
 
-    override suspend fun getPageList(chapter: SChapter): List<Page> = fetchRsc(getChapterUrl(chapter))
-        .extractNextJsRsc<ReaderDto>()
-        ?.pages
-        ?.takeIf(List<PageDto>::isNotEmpty)
+    private suspend fun List<SChapter>.dropUnpublished(): List<SChapter> = drop(take(MAX_UNPUBLISHED_PROBES).takeWhile { fetchPages(it).isEmpty() }.size)
+
+    override suspend fun getPageList(chapter: SChapter): List<Page> = fetchPages(chapter)
+        .takeIf(List<PageDto>::isNotEmpty)
         ?.sortedBy(PageDto::pageNumber)
         ?.mapIndexed { index, page -> Page(index, imageUrl = page.photo) }
         ?: throw IOException("Capítulo indisponível no site")
+
+    private suspend fun fetchPages(chapter: SChapter): List<PageDto> = fetchRsc(getChapterUrl(chapter))
+        .extractNextJsRsc<ReaderDto>()
+        ?.pages
+        .orEmpty()
 
     private suspend fun fetchRsc(url: String): String = client.get(url, Headers.Builder().addAll(headers).set("RSC", "1").build()).body.string()
 
@@ -200,6 +205,7 @@ abstract class AkaitoMangas : KeiSource() {
         private const val CATALOG_PATH = "projetos"
         private const val CHAPTER_PATH = "capitulo"
         private const val FREE_ACCESS = "FREE"
+        private const val MAX_UNPUBLISHED_PROBES = 10
         private const val ACTION_RESULT_PREFIX = "1:"
         private val ACTION_MEDIA_TYPE = "text/plain;charset=UTF-8".toMediaType()
         private val UUID = Regex("""[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}""")
