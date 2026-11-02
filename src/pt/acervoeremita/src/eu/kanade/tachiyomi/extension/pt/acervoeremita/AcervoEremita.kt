@@ -22,7 +22,9 @@ import kotlinx.serialization.json.put
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
@@ -32,6 +34,17 @@ import kotlin.time.Instant
 abstract class AcervoEremita : KeiSource() {
 
     override fun OkHttpClient.Builder.configureClient(): OkHttpClient.Builder = rateLimit(3) { it.host == baseUrl.toHttpUrl().host }
+        .addInterceptor(::fallbackImage)
+
+    private fun fallbackImage(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        val fallback = request.url.fragment?.takeIf { request.url.host == STORAGE_HOST } ?: return chain.proceed(request)
+        val response = chain.proceed(request)
+        if (response.isSuccessful) return response
+
+        response.close()
+        return chain.proceed(request.newBuilder().url(baseUrl + fallback).build())
+    }
 
     override suspend fun getPopularManga(page: Int): MangasPage {
         val document = client.get("$baseUrl/?page=$page").asJsoup()
@@ -144,7 +157,12 @@ abstract class AcervoEremita : KeiSource() {
 
         return reader.pages
             .sortedBy(PageDto::pageNumber)
-            .mapIndexed { index, page -> Page(index, imageUrl = baseUrl + page.imageUrl) }
+            .mapIndexed { index, page -> Page(index, imageUrl = "${page.storageUrl()}#${page.imageUrl}") }
+    }
+
+    private fun PageDto.storageUrl(): String = when {
+        "/" in imageSrc -> "https://$STORAGE_HOST/wp-content/uploads/WP-manga/data/${imageSrc.trimStart('/')}"
+        else -> "https://$STORAGE_HOST$imagePathReader"
     }
 
     private suspend fun fetchRsc(url: String): String = client.get(url, Headers.Builder().addAll(headers).set("RSC", "1").build()).body.string()
@@ -178,6 +196,7 @@ abstract class AcervoEremita : KeiSource() {
         private const val NOVEL_GENRE = "Novel"
         private const val CHAPTER_PAGE_SIZE = 80
         private const val MEMO_CHAPTER_ID = "chapterId"
+        private const val STORAGE_HOST = "cdn.verdinha.wtf"
         private val WORK_ID = Regex("""WorkScreen_(\d+)""")
     }
 }

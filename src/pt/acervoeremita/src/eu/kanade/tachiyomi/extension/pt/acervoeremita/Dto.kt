@@ -63,6 +63,8 @@ class ReaderChapterDto(
 @Serializable
 class PageDto(
     val pageNumber: Int,
+    val imageSrc: String,
+    val imagePathReader: String,
     val imageUrl: String,
 )
 
