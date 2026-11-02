@@ -5,6 +5,7 @@ import eu.kanade.tachiyomi.source.model.SManga
 import keiyoushi.utils.tryParse
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.time.Instant
@@ -80,7 +81,8 @@ class SeriesDto(
 
 @Serializable
 class ChapterListDto(
-    val chapters: List<ChapterDto>,
+    val chapters: List<ChapterDto> = emptyList(),
+    val total: Int? = null,
 )
 
 @Serializable
@@ -89,8 +91,12 @@ class ChapterDto(
     private val numero: Float,
     private val titulo: String? = null,
     private val createdAt: String? = null,
+    private val vipLockHours: Int = 0,
 ) {
     val label get() = numero.toString().removeSuffix(".0")
+
+    // VIP early access: the chapter opens to everyone vipLockHours after release.
+    fun isLocked(now: Long) = vipLockHours > 0 && Instant.tryParse(createdAt) + vipLockHours * 3_600_000L > now
 
     fun toSChapter(slug: String) = SChapter.create().apply {
         url = "/series/$slug/$label"
@@ -106,5 +112,23 @@ class ChapterDto(
 
 @Serializable
 class PagesDto(
-    val pages: List<String> = emptyList(),
+    val id: Long? = null,
+    val pages: List<String>? = null,
+    val enc: String? = null,
+    private val kid: JsonPrimitive? = null,
+) {
+    val keyId get() = kid?.content
+}
+
+@Serializable
+class ReaderKeysDto(
+    val keys: List<ReaderKeyDto> = emptyList(),
 )
+
+@Serializable
+class ReaderKeyDto(
+    private val kid: JsonPrimitive,
+    val k: String,
+) {
+    val id get() = kid.content
+}

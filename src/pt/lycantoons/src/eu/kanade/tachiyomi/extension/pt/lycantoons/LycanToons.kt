@@ -17,6 +17,8 @@ import keiyoushi.utils.parseAs
 import keiyoushi.utils.toJsonRequestBody
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.JsonElement
 import okhttp3.Headers
 import okhttp3.HttpUrl
@@ -27,7 +29,14 @@ import java.io.IOException
 @Source
 abstract class LycanToons : KeiSource() {
 
+    private val browser = BrowserFetch()
+
+    private val readerKeyLock = Mutex()
+
+    private var readerKeys: Map<String, ByteArray> = emptyMap()
+
     override fun OkHttpClient.Builder.configureClient(): OkHttpClient.Builder = rateLimit(2)
+        .addInterceptor(browser.imageInterceptor)
 
     // Cloudflare blocks non-browser clients that send the site as Referer, and challenges any
     // request without Accept-Language.
@@ -98,13 +107,50 @@ abstract class LycanToons : KeiSource() {
     // Entries saved before 1.6.2 keep the "/series/" prefix.
     override fun getMangaUrl(manga: SManga): String = "$baseUrl/series/${manga.url.substringAfterLast('/')}"
 
-    private suspend fun fetchChapters(slug: String): List<ChapterDto> = client.get("$baseUrl/api/series/$slug/chapters").parseAs<ChapterListDto>().chapters
+    // The site pages this endpoint with skip/take (max 100) and VIP early-access chapters can't be read yet.
+    private suspend fun fetchChapters(slug: String): List<ChapterDto> {
+        val chapters = LinkedHashMap<Long, ChapterDto>()
+        var skip = 0
+
+        while (true) {
+            val page = client.get("$baseUrl/api/series/$slug/chapters?skip=$skip&take=$CHAPTER_PAGE_SIZE").parseAs<ChapterListDto>()
+            val before = chapters.size
+            page.chapters.forEach { chapters.putIfAbsent(it.id, it) }
+            skip += page.chapters.size
+
+            val exhausted = page.chapters.size < CHAPTER_PAGE_SIZE || page.total?.let { skip >= it } == true
+            if (exhausted || chapters.size == before) break
+        }
+
+        val now = System.currentTimeMillis()
+        return chapters.values.filterNot { it.isLocked(now) }
+    }
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val id = chapter.memo["id"]?.long ?: findChapterId(chapter)
+        val result = browser.text("$baseUrl/", "/api/chapters/$id/view-pages").parseAs<PagesDto>()
+        val pages = when {
+            result.enc != null -> decryptPages(result.enc, result.keyId ?: throw IOException("Chave de leitura ausente"))
+            else -> result.pages.orEmpty()
+        }
 
-        return client.get("$baseUrl/api/chapters/$id/view-pages").parseAs<PagesDto>().pages
-            .mapIndexed { index, url -> Page(index, imageUrl = url) }
+        return pages.mapIndexed { index, url -> Page(index, imageUrl = url) }
+    }
+
+    private suspend fun decryptPages(enc: String, kid: String): List<String> = ReaderCipher.decrypt(enc, readerKey(kid)).parseAs()
+
+    // Keys rotate hourly; the reader keeps a small window and refetches (bypassing the cache) when a kid is missing.
+    private suspend fun readerKey(kid: String): ByteArray = readerKeyLock.withLock {
+        readerKeys[kid]
+            ?: refreshReaderKeys(reload = false)[kid]
+            ?: refreshReaderKeys(reload = true)[kid]
+            ?: throw IOException("Chave de leitura expirada")
+    }
+
+    private suspend fun refreshReaderKeys(reload: Boolean): Map<String, ByteArray> {
+        val keys = browser.text("$baseUrl/", "/api/reader-key", reload).parseAs<ReaderKeysDto>().keys
+
+        return keys.associate { it.id to ReaderCipher.unmaskKey(it.k) }.also { readerKeys = it }
     }
 
     private suspend fun findChapterId(chapter: SChapter): Long {
@@ -123,5 +169,6 @@ abstract class LycanToons : KeiSource() {
 
     companion object {
         private const val PAGE_SIZE = 24
+        private const val CHAPTER_PAGE_SIZE = 100
     }
 }
