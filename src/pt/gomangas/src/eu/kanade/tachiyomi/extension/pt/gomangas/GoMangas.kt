@@ -16,6 +16,9 @@ import keiyoushi.utils.parseAs
 import keiyoushi.utils.toJsonElement
 import keiyoushi.utils.tryParse
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -82,16 +85,18 @@ abstract class GoMangas : KeiSource() {
 
     private fun Document.toSManga(slug: String) = SManga.create().apply {
         val book = select("script[type=application/ld+json]")
-            .map { it.data().parseAs<BookDto>() }
-            .firstOrNull { it.type == "Book" }
+            .map { it.data().parseAs<JsonElement>() }
+            .filterIsInstance<JsonObject>()
+            .firstOrNull { it["@type"]?.jsonPrimitive?.contentOrNull == "Book" }
+            ?.parseAs<BookDto>()
         val badges = select("div.mb-3 > span").map(Element::text)
 
         url = slug
         title = selectFirst("h1")!!.text()
         thumbnail_url = book?.image ?: selectFirst("meta[property=og:image]")?.attr("content")
-        author = book?.author?.name ?: selectFirst("h1 + p span")?.text()
+        author = book?.authorName ?: selectFirst("h1 + p span")?.text()
         description = book?.description
-        genre = (badges.take(1) + book?.genre.orEmpty()).distinct().joinToString()
+        genre = (badges.take(1) + book?.genres.orEmpty()).distinct().joinToString()
         status = badges.firstNotNullOfOrNull { STATUS[it] } ?: SManga.UNKNOWN
     }
 

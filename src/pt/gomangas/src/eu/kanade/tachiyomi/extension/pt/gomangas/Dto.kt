@@ -1,21 +1,30 @@
 package eu.kanade.tachiyomi.extension.pt.gomangas
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 @Serializable
 class BookDto(
-    @SerialName("@type") val type: String? = null,
     val image: String? = null,
     val description: String? = null,
-    val genre: List<String> = emptyList(),
-    val author: AuthorDto? = null,
-)
+    private val genre: JsonElement? = null,
+    private val author: JsonElement? = null,
+) {
+    val genres: List<String> get() = genre.texts()
 
-@Serializable
-class AuthorDto(
-    val name: String? = null,
-)
+    val authorName: String? get() = author.texts().joinToString().ifEmpty { null }
+
+    private fun JsonElement?.texts(): List<String> = when (this) {
+        is JsonArray -> flatMap { it.texts() }
+        is JsonObject -> get("name").texts()
+        is JsonPrimitive -> listOfNotNull(contentOrNull?.takeIf(String::isNotBlank))
+        else -> emptyList()
+    }
+}
 
 @Serializable
 class ChapterDto(
