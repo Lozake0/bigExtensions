@@ -9,6 +9,7 @@ import eu.kanade.tachiyomi.source.model.SMangaUpdate
 import eu.kanade.tachiyomi.util.asJsoup
 import keiyoushi.annotation.Source
 import keiyoushi.network.get
+import keiyoushi.network.head
 import keiyoushi.network.rateLimit
 import keiyoushi.source.KeiSource
 import keiyoushi.utils.parseAs
@@ -20,6 +21,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.io.IOException
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -124,11 +126,16 @@ abstract class MonteTaiScanlator : KeiSource() {
             }
         }
 
-    override suspend fun getPageList(chapter: SChapter): List<Page> = client.get(getChapterUrl(chapter))
-        .asJsoup()
-        .select(".reading-content img.wp-manga-chapter-img")
-        .mapNotNull(Element::imageUrl)
-        .mapIndexed { index, url -> Page(index, imageUrl = url) }
+    override suspend fun getPageList(chapter: SChapter): List<Page> {
+        val images = client.get(getChapterUrl(chapter))
+            .asJsoup()
+            .select(".reading-content img.wp-manga-chapter-img")
+            .mapNotNull(Element::imageUrl)
+        val available = images.firstOrNull()?.let { url -> client.head(url, ensureSuccess = false).use { it.isSuccessful } } ?: false
+        if (!available) throw IOException("Capítulo indisponível no site")
+
+        return images.mapIndexed { index, url -> Page(index, imageUrl = url) }
+    }
 
     override val supportsFilterFetching: Boolean get() = true
 
