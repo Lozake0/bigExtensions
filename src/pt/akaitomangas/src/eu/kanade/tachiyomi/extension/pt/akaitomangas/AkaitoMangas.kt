@@ -160,9 +160,10 @@ abstract class AkaitoMangas : KeiSource() {
     override suspend fun getPageList(chapter: SChapter): List<Page> = fetchRsc(getChapterUrl(chapter))
         .extractNextJsRsc<ReaderDto>()
         ?.pages
-        .orEmpty()
-        .sortedBy(PageDto::pageNumber)
-        .mapIndexed { index, page -> Page(index, imageUrl = page.photo) }
+        ?.takeIf(List<PageDto>::isNotEmpty)
+        ?.sortedBy(PageDto::pageNumber)
+        ?.mapIndexed { index, page -> Page(index, imageUrl = page.photo) }
+        ?: throw IOException("Capítulo indisponível no site")
 
     private suspend fun fetchRsc(url: String): String = client.get(url, Headers.Builder().addAll(headers).set("RSC", "1").build()).body.string()
 
