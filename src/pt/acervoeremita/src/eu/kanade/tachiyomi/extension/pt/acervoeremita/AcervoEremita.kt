@@ -161,7 +161,7 @@ abstract class AcervoEremita : KeiSource() {
     }
 
     private fun PageDto.storageUrl(): String = when {
-        "/" in imageSrc -> "https://$STORAGE_HOST/wp-content/uploads/WP-manga/data/${imageSrc.trimStart('/')}"
+        imageSrc.startsWith("/") || imageSrc.startsWith("manga_") -> "https://$STORAGE_HOST/wp-content/uploads/WP-manga/data/${imageSrc.trimStart('/')}"
         else -> "https://$STORAGE_HOST$imagePathReader"
     }
 
