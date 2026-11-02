@@ -55,6 +55,14 @@ class TextFilter(name: String, private val parameter: String) :
     }
 }
 
+class NumberFilter(name: String, private val parameter: String) :
+    Filter.Text(name),
+    UrlFilter {
+    override fun addToUrl(builder: HttpUrl.Builder) {
+        state.trim().toIntOrNull()?.let { builder.addQueryParameter(parameter, it.toString()) }
+    }
+}
+
 class CheckBoxOption(name: String, val value: String) : Filter.CheckBox(name)
 
 open class CheckBoxGroup(

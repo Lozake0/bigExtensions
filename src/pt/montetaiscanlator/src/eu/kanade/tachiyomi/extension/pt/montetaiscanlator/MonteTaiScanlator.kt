@@ -132,10 +132,18 @@ abstract class MonteTaiScanlator : KeiSource() {
     override suspend fun fetchFilterData(): JsonElement {
         val document = client.get("$baseUrl/?s=&post_type=wp-manga").asJsoup()
         val labels = document.select("label[for]").associate { it.attr("for") to it.text() }
+        val usedGenres = fetchUsedGenres()
 
         return document.select("input[name='genre[]']")
             .map { GenreDto(labels[it.id()] ?: it.attr("value"), it.attr("value")) }
+            .filter { usedGenres.isEmpty() || it.slug in usedGenres }
             .toJsonElement()
+    }
+
+    private suspend fun fetchUsedGenres(): Set<String> = client.get("$baseUrl/wp-sitemap-taxonomies-wp-manga-genre-1.xml", ensureSuccess = false).use { response ->
+        if (!response.isSuccessful) return emptySet()
+
+        GENRE_SLUG.findAll(response.body.string()).map { it.groupValues[1] }.toSet()
     }
 
     override fun getFilterList(data: JsonElement?): FilterList = FilterList(
@@ -146,7 +154,7 @@ abstract class MonteTaiScanlator : KeiSource() {
             GenreModeFilter(),
             TextFilter("Autor", "author"),
             TextFilter("Artista", "artist"),
-            TextFilter("Ano de lançamento", "release"),
+            NumberFilter("Ano de lançamento", "release"),
         ),
     )
 
@@ -157,6 +165,7 @@ abstract class MonteTaiScanlator : KeiSource() {
     companion object {
         private const val MANGA_PATH = "manga"
         private val CHAPTER_NUMBER = Regex("""\d+(?:[.,]\d+)?""")
+        private val GENRE_SLUG = Regex("""<loc>[^<]*/genero/([^/<]+)/?</loc>""")
         private val DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     }
 }
