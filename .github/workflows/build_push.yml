@@ -1,0 +1,200 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.github/**'
+      - '.github/workflows/build_push.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  CI_CHUNK_SIZE: 80
+  IS_PR_CHECK: false
+
+jobs:
+  prepare:
+    name: Prepare job
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.generate-matrices.outputs.matrix }}
+      delete: ${{ steps.generate-matrices.outputs.delete }}
+      base: ${{ steps.shas.outputs.base }}
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Load publishing scripts
+        shell: bash
+        env:
+          CI_SCRIPTS: ${{ secrets.CI_SCRIPTS }}
+        run: |
+          mkdir -p .github/scripts
+          printf '%s' "$CI_SCRIPTS" | base64 --decode | tar -xz -C .github/scripts
+
+      - name: Get last successful CI commit
+        id: shas
+        uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
+        with:
+          fallback-sha: 4b825dc642cb6eb9a060e54bf8d69288fbee4904 # empty tree
+
+      - id: generate-matrices
+        name: Create output matrices
+        run: python ./.github/scripts/generate-build-matrices.py "$NX_BASE"
+
+  build:
+    name: Build extensions (${{ matrix.chunk.number }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: ${{ toJson(fromJson(needs.prepare.outputs.matrix).chunk) != '[]' }}
+    strategy:
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-read-only: ${{ matrix.chunk.number > 1 }}
+
+      - name: Prepare signing key
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY_FINGERPRINT: ${{ secrets.SIGNING_KEY_FINGERPRINT }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        run: |
+          echo "$SIGNING_KEY" | base64 -d > signingkey.jks
+          # Signing with another key would force every user to reinstall, so refuse it up front.
+          FINGERPRINT=$(keytool -list -v -keystore signingkey.jks -storepass "$KEY_STORE_PASSWORD" -alias "$ALIAS" | sed -n 's/^\s*SHA256:\s*//p' | head -n 1 | tr -d ':' | tr 'A-F' 'a-f')
+          [ "$FINGERPRINT" = "$SIGNING_KEY_FINGERPRINT" ] || { echo "signingkey.jks does not match SIGNING_KEY_FINGERPRINT"; exit 1; }
+
+      - name: Build extensions (${{ matrix.chunk.number }})
+        env:
+          MODULES: ${{ join(matrix.chunk.modules, ' ') }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          # signingkey.jks is PKCS12, which protects its key with the store password.
+          KEY_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        run: |
+          TASKS=()
+          for module in $MODULES; do
+            TASKS+=("${module}:assembleRelease")
+          done
+          ./gradlew "${TASKS[@]}"
+
+      - name: Upload APKs (${{ matrix.chunk.number }})
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: "individual-apks-${{ matrix.chunk.number }}"
+          path: |
+            **/build/outputs/apk/release/*.apk
+            **/build/outputs/jar/release/*.jar
+            **/build/keiyoushi-source-info.json
+          retention-days: 1
+
+      - name: Clean up CI files
+        if: always()
+        run: rm -f signingkey.jks
+
+  publish:
+    name: Publish extension repo
+    needs: [prepare, build]
+    if: >-
+      always() &&
+      needs.prepare.result == 'success' &&
+      needs.build.result != 'failure' &&
+      needs.build.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK artifacts
+        if: needs.build.result == 'success'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: ~/apk-artifacts
+
+      - name: Checkout main branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Load publishing scripts
+        working-directory: main
+        shell: bash
+        env:
+          CI_SCRIPTS: ${{ secrets.CI_SCRIPTS }}
+        run: |
+          mkdir -p .github/scripts
+          printf '%s' "$CI_SCRIPTS" | base64 --decode | tar -xz -C .github/scripts
+
+      - name: Checkout repo branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: repo
+          path: repo
+          persist-credentials: true
+
+      - name: Publish and deploy repo
+        id: deploy
+        env:
+          DELETE: ${{ needs.prepare.outputs.delete }}
+          GH_TOKEN: ${{ github.token }}
+          SIGNING_KEY_FINGERPRINT: ${{ secrets.SIGNING_KEY_FINGERPRINT }}
+        run: |
+          cd repo
+          pip install protobuf
+          python -u ../main/.github/scripts/publish-repo.py "$DELETE" "$GITHUB_SHA"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Update extensions repo"
+            git push
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Announce on Discord
+        if: steps.deploy.outputs.published == 'true'
+        continue-on-error: true
+        working-directory: main
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          BASE: ${{ needs.prepare.outputs.base }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "DISCORD_WEBHOOK not set, skipping"
+            exit 0
+          fi
+          python3 .github/discord_announce.py
