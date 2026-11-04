@@ -1,1 +1,793 @@
-{}
+{
+  "name": "bigExtensions",
+  "badgeLabel": "BIG",
+  "signingKey": "8a6ca214f361cd7f23bd67304c6297e8ac89977be0368fe17e32ee51ff09e9d2",
+  "contact": {
+    "website": "https://github.com/Lozake0/bigExtensions"
+  },
+  "extensionList": {
+    "extensions": [
+      {
+        "name": "Asura Scans",
+        "packageName": "eu.kanade.tachiyomi.extension.en.asurascans",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.asurascans-v1.6.70.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/asurascans/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.asurascans-v1.6.70.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "70",
+        "versionName": "1.6.70",
+        "contentWarning": "CONTENT_WARNING_SAFE",
+        "sources": [
+          {
+            "id": "6247824327199706550",
+            "name": "Asura Scans",
+            "language": "en",
+            "homeUrl": "https://asurascans.com"
+          }
+        ]
+      },
+      {
+        "name": "Atsumaru",
+        "packageName": "eu.kanade.tachiyomi.extension.en.atsumaru",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.atsumaru-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/atsumaru/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.atsumaru-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "6354986011843597399",
+            "name": "Atsumaru",
+            "language": "en",
+            "homeUrl": "https://atsu.moe"
+          }
+        ]
+      },
+      {
+        "name": "Comix",
+        "packageName": "eu.kanade.tachiyomi.extension.en.comix",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.comix-v1.6.38.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/comix/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.comix-v1.6.38.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "38",
+        "versionName": "1.6.38",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "7537715367149829912",
+            "name": "Comix",
+            "language": "en",
+            "homeUrl": "https://comix.to",
+            "mirrorUrls": [
+              "https://comix.to",
+              "https://comix.ws"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Kagane",
+        "packageName": "eu.kanade.tachiyomi.extension.en.kagane",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.kagane-v1.6.32.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/kagane/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.kagane-v1.6.32.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "32",
+        "versionName": "1.6.32",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "4024736764982024684",
+            "name": "Kagane",
+            "language": "en",
+            "homeUrl": "https://kagane.to"
+          }
+        ]
+      },
+      {
+        "name": "MangaBall",
+        "packageName": "eu.kanade.tachiyomi.extension.en.mangaball",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.mangaball-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/mangaball/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.mangaball-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "4778354629668307586",
+            "name": "MangaBall",
+            "language": "en",
+            "homeUrl": "https://mangaball.com"
+          }
+        ]
+      },
+      {
+        "name": "MangaDot",
+        "packageName": "eu.kanade.tachiyomi.extension.en.mangadot",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.mangadot-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/mangadot/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.mangadot-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "1510817062915473461",
+            "name": "MangaDot",
+            "language": "en",
+            "homeUrl": "https://mangadot.net"
+          }
+        ]
+      },
+      {
+        "name": "MangaFire",
+        "packageName": "eu.kanade.tachiyomi.extension.en.mangafire",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.mangafire-v1.6.32.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/mangafire/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.mangafire-v1.6.32.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "32",
+        "versionName": "1.6.32",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "6084907896154116083",
+            "name": "MangaFire",
+            "language": "en",
+            "homeUrl": "https://mangafire.to"
+          }
+        ]
+      },
+      {
+        "name": "OniSaga",
+        "packageName": "eu.kanade.tachiyomi.extension.en.onisaga",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.onisaga-v1.6.5.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/onisaga/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.onisaga-v1.6.5.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "5",
+        "versionName": "1.6.5",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "2644848669022862951",
+            "name": "OniSaga",
+            "language": "en",
+            "homeUrl": "https://onisaga.com"
+          }
+        ]
+      },
+      {
+        "name": "Acervo Eremita",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.acervoeremita",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.acervoeremita-v1.6.4.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/acervoeremita/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.acervoeremita-v1.6.4.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "4",
+        "versionName": "1.6.4",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "5884310876208900393",
+            "name": "Acervo Eremita",
+            "language": "pt-BR",
+            "homeUrl": "https://acervoeremita.com"
+          }
+        ]
+      },
+      {
+        "name": "Akaito Mang\u00e1s",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.akaitomangas",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.akaitomangas-v1.6.3.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/akaitomangas/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.akaitomangas-v1.6.3.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "3",
+        "versionName": "1.6.3",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "2836576732412182275",
+            "name": "Akaito Mang\u00e1s",
+            "language": "pt-BR",
+            "homeUrl": "https://akaitomangas.com"
+          }
+        ]
+      },
+      {
+        "name": "AstraToons",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.astratoons",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.astratoons-v1.6.3.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/astratoons/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.astratoons-v1.6.3.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "3",
+        "versionName": "1.6.3",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "568706475308881719",
+            "name": "AstraToons",
+            "language": "pt-BR",
+            "homeUrl": "https://new.astratoons.com"
+          }
+        ]
+      },
+      {
+        "name": "Aura Toons",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.auratoons",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.auratoons-v1.6.3.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/auratoons/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.auratoons-v1.6.3.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "3",
+        "versionName": "1.6.3",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "6513968363934843007",
+            "name": "Aura Toons",
+            "language": "pt-BR",
+            "homeUrl": "https://auratoons.com"
+          }
+        ]
+      },
+      {
+        "name": "Blitz Toons",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.blitztoons",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.blitztoons-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/blitztoons/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.blitztoons-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "2916575821827748941",
+            "name": "Blitz Toons",
+            "language": "pt-BR",
+            "homeUrl": "https://blitztoons.com"
+          }
+        ]
+      },
+      {
+        "name": "CorujaToon",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.corujatoon",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.corujatoon-v1.6.4.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/corujatoon/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.corujatoon-v1.6.4.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "4",
+        "versionName": "1.6.4",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "3746809004727795505",
+            "name": "CorujaToon",
+            "language": "pt-BR",
+            "homeUrl": "https://corujatoon.com"
+          }
+        ]
+      },
+      {
+        "name": "GoMangas",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.gomangas",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.gomangas-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/gomangas/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.gomangas-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "2283787061999577853",
+            "name": "GoMangas",
+            "language": "pt-BR",
+            "homeUrl": "https://gomangas.com"
+          }
+        ]
+      },
+      {
+        "name": "Hipertoon",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.hipertoon",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.hipertoon-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/hipertoon/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.hipertoon-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "977626289899996655",
+            "name": "Hipertoon",
+            "language": "pt-BR",
+            "homeUrl": "https://hipertoon.com"
+          }
+        ]
+      },
+      {
+        "name": "Imperio da Britannia",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.imperiodabritannia",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.imperiodabritannia-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/imperiodabritannia/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.imperiodabritannia-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "8503132573578747741",
+            "name": "Imperio da Britannia",
+            "language": "pt-BR",
+            "homeUrl": "https://imperiodabritannia.net"
+          }
+        ]
+      },
+      {
+        "name": "Ink Scan",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.inkscan",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.inkscan-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/inkscan/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.inkscan-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "2060124440831877790",
+            "name": "Ink Scan",
+            "language": "pt-BR",
+            "homeUrl": "https://inkscann.live"
+          }
+        ]
+      },
+      {
+        "name": "Kitsune Yako",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.kitsuneyako",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.kitsuneyako-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/kitsuneyako/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.kitsuneyako-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "2697597408611720658",
+            "name": "Kitsune Yako",
+            "language": "pt-BR",
+            "homeUrl": "https://kitsuneyako.com"
+          }
+        ]
+      },
+      {
+        "name": "KuroMangas",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.kuromangas",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.kuromangas-v1.6.18.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/kuromangas/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.kuromangas-v1.6.18.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "18",
+        "versionName": "1.6.18",
+        "contentWarning": "CONTENT_WARNING_SAFE",
+        "sources": [
+          {
+            "id": "73579729889528478",
+            "name": "KuroMangas",
+            "language": "pt-BR",
+            "homeUrl": "https://kuromangas.com"
+          }
+        ]
+      },
+      {
+        "name": "LycanToons",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.lycantoons",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.lycantoons-v1.6.4.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/lycantoons/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.lycantoons-v1.6.4.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "4",
+        "versionName": "1.6.4",
+        "contentWarning": "CONTENT_WARNING_SAFE",
+        "sources": [
+          {
+            "id": "9220781378249537158",
+            "name": "LycanToons",
+            "language": "pt-BR",
+            "homeUrl": "https://lycantoons.com"
+          }
+        ]
+      },
+      {
+        "name": "Mang\u00e1Dash",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.mangadash",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangadash-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/mangadash/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangadash-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "443994894937697339",
+            "name": "Mang\u00e1Dash",
+            "language": "pt-BR",
+            "homeUrl": "https://mangadash.net"
+          }
+        ]
+      },
+      {
+        "name": "MangaLivre.blog",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.mangalivreblog",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangalivreblog-v1.6.4.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/mangalivreblog/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangalivreblog-v1.6.4.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "4",
+        "versionName": "1.6.4",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "185602996997722921",
+            "name": "MangaLivre.blog",
+            "language": "pt-BR",
+            "homeUrl": "https://mangalivre.blog"
+          }
+        ]
+      },
+      {
+        "name": "Manga Online",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.mangaonline",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangaonline-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/mangaonline/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangaonline-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_SAFE",
+        "sources": [
+          {
+            "id": "3930085636692943299",
+            "name": "Manga Online",
+            "language": "pt-BR",
+            "homeUrl": "https://mangaonline.love"
+          }
+        ]
+      },
+      {
+        "name": "Mangas Brasuka",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.mangasbrasuka",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangasbrasuka-v1.6.59.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/mangasbrasuka/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangasbrasuka-v1.6.59.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "59",
+        "versionName": "1.6.59",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "9021069622172695017",
+            "name": "Mangas Brasuka",
+            "language": "pt-BR",
+            "homeUrl": "https://mangasbrasuka.org"
+          }
+        ]
+      },
+      {
+        "name": "MangaStop",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.mangastop",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangastop-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/mangastop/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangastop-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "4122351080341849347",
+            "name": "MangaStop",
+            "language": "pt-BR",
+            "homeUrl": "https://mangastop.net"
+          }
+        ]
+      },
+      {
+        "name": "MangoToons",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.mangotoons",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangotoons-v1.6.3.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/mangotoons/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.mangotoons-v1.6.3.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "3",
+        "versionName": "1.6.3",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "8314531811881566965",
+            "name": "MangoToons",
+            "language": "pt-BR",
+            "homeUrl": "https://mangotoons.com"
+          }
+        ]
+      },
+      {
+        "name": "Monte Tai Scanlator",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.montetaiscanlator",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.montetaiscanlator-v1.6.4.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/montetaiscanlator/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.montetaiscanlator-v1.6.4.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "4",
+        "versionName": "1.6.4",
+        "contentWarning": "CONTENT_WARNING_SAFE",
+        "sources": [
+          {
+            "id": "1250129720422812178",
+            "name": "Monte Tai Scanlator",
+            "language": "pt-BR",
+            "homeUrl": "https://montetaiscanlator.xyz"
+          }
+        ]
+      },
+      {
+        "name": "Nexus Mang\u00e1s",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.nexusmangas",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.nexusmangas-v1.6.5.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/nexusmangas/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.nexusmangas-v1.6.5.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "5",
+        "versionName": "1.6.5",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "3647960912061862872",
+            "name": "Nexus Mang\u00e1s",
+            "language": "pt-BR",
+            "homeUrl": "https://www.nexusmangas.com"
+          }
+        ]
+      },
+      {
+        "name": "OneReader",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.onereader",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.onereader-v1.6.2.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/onereader/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.onereader-v1.6.2.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "2",
+        "versionName": "1.6.2",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "5026351287650198434",
+            "name": "OneReader",
+            "language": "pt-BR",
+            "homeUrl": "https://onereader.net"
+          }
+        ]
+      },
+      {
+        "name": "Pizzaria Scan",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.pizzariascan",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.pizzariascan-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/pizzariascan/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.pizzariascan-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "3359822911747375789",
+            "name": "Pizzaria Scan",
+            "language": "pt-BR",
+            "homeUrl": "https://pizzariacomics.com"
+          }
+        ]
+      },
+      {
+        "name": "WiComix",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.remangas",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.remangas-v1.6.56.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/remangas/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.remangas-v1.6.56.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "56",
+        "versionName": "1.6.56",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "7462657023971681136",
+            "name": "WiComix",
+            "language": "pt-BR",
+            "homeUrl": "https://loobyt.org"
+          }
+        ]
+      },
+      {
+        "name": "Roxinha",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.roxinha",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.roxinha-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/roxinha/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.roxinha-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "3961079268907869519",
+            "name": "Roxinha",
+            "language": "pt-BR",
+            "homeUrl": "https://roxinha.online"
+          }
+        ]
+      },
+      {
+        "name": "Yomu Comics",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.sssscanlator",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.sssscanlator-v1.6.62.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/sssscanlator/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.sssscanlator-v1.6.62.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "62",
+        "versionName": "1.6.62",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "1497838059713668619",
+            "name": "Yomu Comics",
+            "language": "pt-BR",
+            "homeUrl": "https://yomu.com.br"
+          }
+        ]
+      },
+      {
+        "name": "Tomato",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.tomato",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.tomato-v1.6.5.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/tomato/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.tomato-v1.6.5.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "5",
+        "versionName": "1.6.5",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "3298973071492789784",
+            "name": "Tomato",
+            "language": "pt-BR",
+            "homeUrl": "https://lozake0.github.io/bigExtensions/tomato"
+          }
+        ]
+      },
+      {
+        "name": "ToonBr",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.toonbr",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.toonbr-v1.6.1.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/toonbr/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.toonbr-v1.6.1.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "1",
+        "versionName": "1.6.1",
+        "contentWarning": "CONTENT_WARNING_SAFE",
+        "sources": [
+          {
+            "id": "534693024654050396",
+            "name": "ToonBr",
+            "language": "pt-BR",
+            "homeUrl": "https://beta.toonbr.com"
+          }
+        ]
+      },
+      {
+        "name": "Vegitoons",
+        "packageName": "eu.kanade.tachiyomi.extension.pt.vegitoons",
+        "resources": {
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.vegitoons-v1.6.14.apk",
+          "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/vegitoons/res/mipmap-xhdpi/ic_launcher.png",
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.vegitoons-v1.6.14.jar"
+        },
+        "extensionLib": "1.6",
+        "versionCode": "14",
+        "versionName": "1.6.14",
+        "contentWarning": "CONTENT_WARNING_MIXED",
+        "sources": [
+          {
+            "id": "7104462396017692362",
+            "name": "Vegitoons",
+            "language": "pt-BR",
+            "homeUrl": "https://vegitoons.black"
+          }
+        ]
+      }
+    ]
+  }
+}
