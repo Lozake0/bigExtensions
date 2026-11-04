@@ -11,14 +11,14 @@
 Open **More → Settings → Browse → Extension repos** and add:
 
 ```
-https://raw.githubusercontent.com/biglongsss/bigExtensions/repo/index.json
+https://raw.githubusercontent.com/Lozake0/bigExtensions/repo/index.json
 ```
 
 The app will list every source. Updates arrive through the same screen.
 
 The repo moved back to GitHub. If you added an older URL (the `biglongs1.gitlab.io` one, or any
-`raw.githubusercontent.com` one under `BigLongs0`, `BigLongss` or `Biglongs1`), remove it and add
-the one above to keep receiving updates. The installed extensions keep working, since they are
+`raw.githubusercontent.com` one under `BigLongs0`, `BigLongss`, `Biglongs1` or `biglongsss`), remove
+it and add the one above to keep receiving updates. The installed extensions keep working, since they are
 signed with the same key.
 
 Forks lag behind on repo support, so if the app rejects the URL, check that it is
@@ -26,7 +26,7 @@ up to date. Yokai, for instance, only accepts this format from 1.10.0 onwards.
 
 ## Requests
 
-Want a source that is not here? [Open a request](https://github.com/biglongsss/bigExtensions/issues/new?template=source_request.yml).
+Want a source that is not here? [Open a request](https://github.com/Lozake0/bigExtensions/issues/new?template=source_request.yml).
 
 Before asking, check that the site is not already covered by [keiyoushi](https://github.com/keiyoushi/extensions), which is a far larger repo and the better home for most sources. This one exists for sources I maintain closely, so requests are accepted based on how reliably I can keep them alive, not on how popular the site is.
 
@@ -38,7 +38,7 @@ A source is unlikely to be accepted when it:
 
 ## Reporting a broken source
 
-Sites change often, and a source that worked yesterday can break without notice. [Report it here](https://github.com/biglongsss/bigExtensions/issues/new?template=broken_source.yml) with the extension version and what exactly stopped working, since browsing, search and reading tend to break independently of each other.
+Sites change often, and a source that worked yesterday can break without notice. [Report it here](https://github.com/Lozake0/bigExtensions/issues/new?template=broken_source.yml) with the extension version and what exactly stopped working, since browsing, search and reading tend to break independently of each other.
 
 ## Contributing
 
