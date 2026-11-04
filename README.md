@@ -16,11 +16,6 @@ https://raw.githubusercontent.com/Lozake0/bigExtensions/repo/index.json
 
 The app will list every source. Updates arrive through the same screen.
 
-The repo moved back to GitHub. If you added an older URL (the `biglongs1.gitlab.io` one, or any
-`raw.githubusercontent.com` one under `BigLongs0`, `BigLongss`, `Biglongs1` or `biglongsss`), remove
-it and add the one above to keep receiving updates. The installed extensions keep working, since they are
-signed with the same key.
-
 Forks lag behind on repo support, so if the app rejects the URL, check that it is
 up to date. Yokai, for instance, only accepts this format from 1.10.0 onwards.
 
