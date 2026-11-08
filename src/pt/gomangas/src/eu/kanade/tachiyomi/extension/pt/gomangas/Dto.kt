@@ -27,12 +27,9 @@ class BookDto(
 }
 
 @Serializable
-class ChapterDto(
-    val slug: String,
-    val numberLabel: String,
-    val createdAt: String,
-    val title: String? = null,
-    val sourcePublishedAt: String? = null,
+class ChapterListDto(
+    val obraSlug: String,
+    val chapters: List<List<String?>>,
 )
 
 @Serializable

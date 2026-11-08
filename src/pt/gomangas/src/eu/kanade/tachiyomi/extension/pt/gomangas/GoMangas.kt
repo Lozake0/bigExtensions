@@ -14,7 +14,6 @@ import keiyoushi.source.KeiSource
 import keiyoushi.utils.extractNextJs
 import keiyoushi.utils.parseAs
 import keiyoushi.utils.toJsonElement
-import keiyoushi.utils.tryParse
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -24,7 +23,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import kotlin.time.Instant
 
 @Source
 abstract class GoMangas : KeiSource() {
@@ -100,19 +98,20 @@ abstract class GoMangas : KeiSource() {
         status = badges.firstNotNullOfOrNull { STATUS[it] } ?: SManga.UNKNOWN
     }
 
-    private fun Document.toSChapters(): List<SChapter> = extractNextJs<List<ChapterDto>>()
-        .orEmpty()
-        .groupBy(ChapterDto::numberLabel)
-        .values
-        .map { group -> group.firstOrNull { it.title != null } ?: group.first() }
-        .map { chapter ->
-            SChapter.create().apply {
-                url = chapter.slug
-                name = chapter.title ?: "Capítulo ${chapter.numberLabel}"
-                chapter_number = chapter.numberLabel.toFloatOrNull() ?: -1f
-                date_upload = Instant.tryParse(chapter.sourcePublishedAt ?: chapter.createdAt)
+    private fun Document.toSChapters(): List<SChapter> {
+        val list = extractNextJs<ChapterListDto>() ?: return emptyList()
+
+        return list.chapters
+            .mapNotNull { entry ->
+                val number = entry.getOrNull(0) ?: return@mapNotNull null
+                SChapter.create().apply {
+                    url = entry.getOrNull(2) ?: "${list.obraSlug}-capitulo-$number"
+                    name = entry.getOrNull(1) ?: "Capítulo $number"
+                    chapter_number = number.toFloatOrNull() ?: -1f
+                }
             }
-        }
+            .distinctBy(SChapter::url)
+    }
 
     override suspend fun getPageList(chapter: SChapter): List<Page> = client.get(getChapterUrl(chapter))
         .asJsoup()
