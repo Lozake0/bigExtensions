@@ -53,7 +53,7 @@ abstract class Kagane :
 
     private val prefs = getPreferences()
 
-    // kagane.to challenges every non-browser client, but not the WebView.
+    // The site challenges every non-browser client, but not the WebView.
     override fun OkHttpClient.Builder.configureClient() = apply {
         interceptors().removeAll { it.javaClass.simpleName == "CloudflareInterceptor" }
         addInterceptor(::refreshTokenInterceptor)

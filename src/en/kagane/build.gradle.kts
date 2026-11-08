@@ -6,13 +6,13 @@ plugins {
 
 keiyoushi {
     name = "Kagane"
-    versionCode = 32
+    versionCode = 33
     contentWarning = ContentWarning.MIXED
     libVersion = "1.6"
 
     source {
         lang = "en"
-        baseUrl = "https://kagane.to"
+        baseUrl = "https://kagane.moe"
     }
 
     deeplink {
