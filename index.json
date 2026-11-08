@@ -288,13 +288,13 @@
         "name": "CorujaToon",
         "packageName": "eu.kanade.tachiyomi.extension.pt.corujatoon",
         "resources": {
-          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.corujatoon-v1.6.4.apk",
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/b7f9cae/tachiyomi-pt.corujatoon-v1.6.5.apk",
           "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/corujatoon/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.corujatoon-v1.6.4.jar"
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/b7f9cae/tachiyomi-pt.corujatoon-v1.6.5.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "4",
-        "versionName": "1.6.4",
+        "versionCode": "5",
+        "versionName": "1.6.5",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {

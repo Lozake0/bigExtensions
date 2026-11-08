@@ -131,12 +131,12 @@
   },
   "eu.kanade.tachiyomi.extension.pt.corujatoon": {
     "apk": {
-      "name": "tachiyomi-pt.corujatoon-v1.6.4.apk",
-      "sha256": "4e5e4d286d802db0c16f6e5ef1c5b5a735d09a3c1ab4fbd43d60b9bb500d23dc"
+      "name": "tachiyomi-pt.corujatoon-v1.6.5.apk",
+      "sha256": "9b1775900ae2a8d0624171dd7e51887638645a55e4ad29d19f7e172b73d825fb"
     },
     "jar": {
-      "name": "tachiyomi-pt.corujatoon-v1.6.4.jar",
-      "sha256": "4ceac58a8865f66b4660dfc04716776b57caf598076c78213ce54ba86e05f2a3"
+      "name": "tachiyomi-pt.corujatoon-v1.6.5.jar",
+      "sha256": "59da30d5e8d0911f5a6d45585ed94ef403edbdd766ef6f7e271fe76add15ae4e"
     }
   },
   "eu.kanade.tachiyomi.extension.pt.gomangas": {
