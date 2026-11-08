@@ -21,22 +21,22 @@
   },
   "eu.kanade.tachiyomi.extension.en.comix": {
     "apk": {
-      "name": "tachiyomi-en.comix-v1.6.38.apk",
-      "sha256": "6d62d75a9f20516aa8fd79c5477ff533c244ffcda016d12883d592abf3308caa"
+      "name": "tachiyomi-en.comix-v1.6.39.apk",
+      "sha256": "1e0aca4bc1a7a3120b57adc6fec3b0b09e5a1a2ff89957cf6e99d6c1ee5d9d5a"
     },
     "jar": {
-      "name": "tachiyomi-en.comix-v1.6.38.jar",
-      "sha256": "9d9d44db7c6c7021ecbb840d12e23503513d207bc6ad801e03772c1f21cb131b"
+      "name": "tachiyomi-en.comix-v1.6.39.jar",
+      "sha256": "f73a8e93f51f2f9b04ce454acea3f92bd811e419e6769993b45442f6a1d1883a"
     }
   },
   "eu.kanade.tachiyomi.extension.en.kagane": {
     "apk": {
-      "name": "tachiyomi-en.kagane-v1.6.32.apk",
-      "sha256": "d5be1ace00bab126ffd290d3d3f468e2e4adcd40fe793e2e6f1b146c07756d2d"
+      "name": "tachiyomi-en.kagane-v1.6.33.apk",
+      "sha256": "e989b9310db0d4d4a0582d14037f79024c3be3d8009efb7495b5da983b8175de"
     },
     "jar": {
-      "name": "tachiyomi-en.kagane-v1.6.32.jar",
-      "sha256": "87194e712f727fba4ecddf5e00b4e3914c871621b11e409a66efb01d4fb9b2ee"
+      "name": "tachiyomi-en.kagane-v1.6.33.jar",
+      "sha256": "e0e1562cf6ea310969dc03e355c079997683272665a38af58af848402e04434a"
     }
   },
   "eu.kanade.tachiyomi.extension.en.mangaball": {
@@ -141,12 +141,12 @@
   },
   "eu.kanade.tachiyomi.extension.pt.gomangas": {
     "apk": {
-      "name": "tachiyomi-pt.gomangas-v1.6.2.apk",
-      "sha256": "6fe93ef8dd4f1cfc609d15fc10ca82117d239566281a4b26da6b7a85ba80c43e"
+      "name": "tachiyomi-pt.gomangas-v1.6.3.apk",
+      "sha256": "ae3682e604adb0efd4ebc153ac81daa69af3db8dfc4336462b41975d123dda4a"
     },
     "jar": {
-      "name": "tachiyomi-pt.gomangas-v1.6.2.jar",
-      "sha256": "c7e71ad7aeadd0a670593a26ed3ab5e06d2bcb116898cc485e44d45ccfa49911"
+      "name": "tachiyomi-pt.gomangas-v1.6.3.jar",
+      "sha256": "311757d157fdb4a655b8b474b21288663a2cc3da1fe6baacc37f3c6ab04ea39d"
     }
   },
   "eu.kanade.tachiyomi.extension.pt.hipertoon": {

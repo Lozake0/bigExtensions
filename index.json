@@ -53,13 +53,13 @@
         "name": "Comix",
         "packageName": "eu.kanade.tachiyomi.extension.en.comix",
         "resources": {
-          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.comix-v1.6.38.apk",
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/c97b73c/tachiyomi-en.comix-v1.6.39.apk",
           "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/comix/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.comix-v1.6.38.jar"
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/c97b73c/tachiyomi-en.comix-v1.6.39.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "38",
-        "versionName": "1.6.38",
+        "versionCode": "39",
+        "versionName": "1.6.39",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
@@ -78,20 +78,20 @@
         "name": "Kagane",
         "packageName": "eu.kanade.tachiyomi.extension.en.kagane",
         "resources": {
-          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.kagane-v1.6.32.apk",
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/c97b73c/tachiyomi-en.kagane-v1.6.33.apk",
           "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/en/kagane/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-en.kagane-v1.6.32.jar"
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/c97b73c/tachiyomi-en.kagane-v1.6.33.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "32",
-        "versionName": "1.6.32",
+        "versionCode": "33",
+        "versionName": "1.6.33",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
             "id": "4024736764982024684",
             "name": "Kagane",
             "language": "en",
-            "homeUrl": "https://kagane.to"
+            "homeUrl": "https://kagane.moe"
           }
         ]
       },
@@ -309,13 +309,13 @@
         "name": "GoMangas",
         "packageName": "eu.kanade.tachiyomi.extension.pt.gomangas",
         "resources": {
-          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.gomangas-v1.6.2.apk",
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/c97b73c/tachiyomi-pt.gomangas-v1.6.3.apk",
           "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/gomangas/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.gomangas-v1.6.2.jar"
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/c97b73c/tachiyomi-pt.gomangas-v1.6.3.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "2",
-        "versionName": "1.6.2",
+        "versionCode": "3",
+        "versionName": "1.6.3",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {
