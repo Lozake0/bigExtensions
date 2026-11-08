@@ -105,7 +105,7 @@ abstract class Comix :
     private suspend fun getMangaListFromBrowse(url: HttpUrl): MangasPage {
         getSigned<SearchResponse>("/api/v1/manga", nativeMangaParams(url))?.let { response ->
             return MangasPage(
-                response.result.items.map { it.toBasicSManga(preferences.posterQuality()) },
+                response.result.items.map { it.toBasicSManga(preferences.posterQuality()).resolveThumbnail() },
                 response.result.hasNextPage(),
             )
         }
@@ -239,7 +239,7 @@ abstract class Comix :
         ).parseAs<SearchResponse>()
 
         val mangaList = searchResponse.result.items.map {
-            it.toBasicSManga(preferences.posterQuality())
+            it.toBasicSManga(preferences.posterQuality()).resolveThumbnail()
         }
         return MangasPage(mangaList, searchResponse.result.hasNextPage())
     }
@@ -444,7 +444,14 @@ abstract class Comix :
             preferences.scorePosition(),
             preferences.showExtraInfo(),
             preferences.showTagsInGenres(),
-        )
+        ).resolveThumbnail()
+    }
+
+    // Posters now come as paths on the site's own host.
+    private fun SManga.resolveThumbnail() = apply {
+        thumbnail_url = thumbnail_url
+            ?.takeIf(String::isNotEmpty)
+            ?.let { baseUrl.toHttpUrl().resolve(it)?.toString() ?: it }
     }
 
     override fun getMangaUrl(manga: SManga): String = "$baseUrl/title${manga.url}"
@@ -466,7 +473,7 @@ abstract class Comix :
             ?: return emptyList()
 
         return related.parseAs<SearchResponse.Items>().items.map {
-            it.toBasicSManga(preferences.posterQuality())
+            it.toBasicSManga(preferences.posterQuality()).resolveThumbnail()
         }
     }
 
@@ -514,10 +521,11 @@ abstract class Comix :
         return payload.parseAs<List<Chapter>>().map { it.toSChapter(mangaSlug) }
     }
 
-    // Loads the site's bundles without running the app and calls its own API client, which signs
-    // requests and decrypts responses in an obfuscated module. Its method names are scrambled, so
-    // the client is found as the exported function that awaits `<client>.get(`. [apiScript] runs
-    // with `apiGet(path, options)` and `pass(payload)` in scope.
+    // Calls the site's own API client, an axios instance whose interceptors sign requests and
+    // decrypt responses in an obfuscated module. The instance itself is not exported, but the
+    // bundled axios is, so its prototype is wrapped to grab the instance on the first API request
+    // the app makes once it boots. [apiScript] runs with `apiGet(path, options)` and
+    // `pass(payload)` in scope.
     private suspend fun runWithSiteApi(document: Document, apiScript: String): String {
         val webViewDocument = document.clone()
         val mainScript = webViewDocument.selectFirst("script[type=module][src*=\"/dist/main-\"]")
@@ -549,20 +557,31 @@ abstract class Comix :
                                     match => match[1]
                                 ))];
                                 const importBundle = new Function('url', 'return import(url)');
-                                let apiGet = null;
+                                let axios = null;
                                 for (const file of bundleFiles) {
                                     const bundle = await importBundle(new URL(file, mainScriptUrl).href);
-                                    for (const value of Object.values(bundle)) {
-                                        if (!value || typeof value !== 'object') continue;
-                                        apiGet = Object.values(value).find(fn =>
-                                            typeof fn === 'function' &&
-                                            /await\s*[\w$]+\.get\(/.test(Function.prototype.toString.call(fn))
-                                        ) || null;
-                                        if (apiGet) break;
-                                    }
-                                    if (apiGet) break;
+                                    axios = Object.values(bundle).find(value =>
+                                        typeof value === 'function' &&
+                                        typeof value.create === 'function' &&
+                                        typeof value.Axios === 'function'
+                                    ) || null;
+                                    if (axios) break;
                                 }
-                                if (!apiGet) throw new Error('Could not find API client');
+                                if (!axios) throw new Error('Could not find API client');
+
+                                const client = await new Promise(resolve => {
+                                    const prototype = axios.Axios.prototype;
+                                    Object.getOwnPropertyNames(prototype).forEach(name => {
+                                        const original = prototype[name];
+                                        if (name === 'constructor' || typeof original !== 'function') return;
+                                        prototype[name] = function () {
+                                            if (/\/api\//.test(String(this?.defaults?.baseURL || ''))) resolve(this);
+                                            return original.apply(this, arguments);
+                                        };
+                                    });
+                                    importBundle(mainScriptUrl).catch(error => window.$${rejectName}(error));
+                                });
+                                const apiGet = (path, options) => client.get(path, options).then(response => response.data);
 
                                 $${apiScript}
                             } catch (error) {
