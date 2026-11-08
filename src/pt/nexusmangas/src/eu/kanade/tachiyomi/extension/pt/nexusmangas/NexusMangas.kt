@@ -178,7 +178,7 @@ abstract class NexusMangas : KeiSource() {
         val number = segments.getOrNull(3) ?: throw IOException("Capítulo inválido")
 
         val url = "$apiUrl/chapters".toHttpUrl().newBuilder()
-            .addQueryParameter("select", "id,works!inner(slug)")
+            .addQueryParameter("select", "id,works!$CHAPTER_WORK_KEY!inner(slug)")
             .addQueryParameter("works.slug", "eq.$slug")
             .addQueryParameter("number", "eq.$number")
             .addQueryParameter("limit", "1")
@@ -232,10 +232,13 @@ abstract class NexusMangas : KeiSource() {
         private const val API_HOST = "supabase.nexusmangas.com"
         private const val PAGE_SIZE = 30
         private const val LIST_COLUMNS = "id,slug,title,cover_url,status,type"
+
+        // Read marks also link works and chapters, so embeds between them must name the foreign key.
+        private const val CHAPTER_WORK_KEY = "chapters_work_id_fkey"
         private const val DETAIL_COLUMNS =
             "id,slug,title,description,cover_url,alternative_title,status,type,author,artist," +
                 "demographic,scan:scans(name),work_genres(genres(name))," +
-                "chapters(number,title,published_at)"
+                "chapters!$CHAPTER_WORK_KEY(number,title,published_at)"
         private const val ANON_KEY =
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
                 "eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc4NzgwMjAwMCwiZXhwIjo0OTQzNDc1NjAwLCJyb2xlIjoiYW5vbiJ9." +
