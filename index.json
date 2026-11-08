@@ -603,13 +603,13 @@
         "name": "Nexus Mang\u00e1s",
         "packageName": "eu.kanade.tachiyomi.extension.pt.nexusmangas",
         "resources": {
-          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.nexusmangas-v1.6.5.apk",
+          "apkUrl": "https://github.com/Lozake0/bigExtensions/releases/download/49e7955/tachiyomi-pt.nexusmangas-v1.6.6.apk",
           "iconUrl": "https://cdn.jsdelivr.net/gh/Lozake0/bigExtensions@main/src/pt/nexusmangas/res/mipmap-xhdpi/ic_launcher.png",
-          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/0d51dd6/tachiyomi-pt.nexusmangas-v1.6.5.jar"
+          "jarUrl": "https://github.com/Lozake0/bigExtensions/releases/download/49e7955/tachiyomi-pt.nexusmangas-v1.6.6.jar"
         },
         "extensionLib": "1.6",
-        "versionCode": "5",
-        "versionName": "1.6.5",
+        "versionCode": "6",
+        "versionName": "1.6.6",
         "contentWarning": "CONTENT_WARNING_MIXED",
         "sources": [
           {

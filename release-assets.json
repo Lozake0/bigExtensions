@@ -281,12 +281,12 @@
   },
   "eu.kanade.tachiyomi.extension.pt.nexusmangas": {
     "apk": {
-      "name": "tachiyomi-pt.nexusmangas-v1.6.5.apk",
-      "sha256": "ed6cd7049573d9a3d79eb640ad3475136edd4313dacd5249acd3a566c0e61b3e"
+      "name": "tachiyomi-pt.nexusmangas-v1.6.6.apk",
+      "sha256": "636dab85aa5ab64324a5a8642257b2b7a19725913c996a4c026ebe08556b7518"
     },
     "jar": {
-      "name": "tachiyomi-pt.nexusmangas-v1.6.5.jar",
-      "sha256": "a10f66e428f3a771d3eed912d9922c8bac1073c8b2b7884e22a56b137a2f8e5d"
+      "name": "tachiyomi-pt.nexusmangas-v1.6.6.jar",
+      "sha256": "7b5ab6947481e4b92296f72fc0fcdcd212d1916faf5a20c1b5fb4b2b7d2ad098"
     }
   },
   "eu.kanade.tachiyomi.extension.pt.onereader": {
