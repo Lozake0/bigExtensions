@@ -61,13 +61,16 @@ class ChapterListDto(
 @Serializable
 class ChapterDto(
     private val number: Float,
-    private val title: String,
+    private val title: String? = null,
     private val publishedAt: String? = null,
     private val isVip: Boolean = false,
 ) {
     fun toSChapter(slug: String) = SChapter.create().apply {
-        url = "/series/$slug/capitulo/${number.toString().removeSuffix(".0")}"
-        name = if (isVip) "🔒 ${title.trim()}" else title.trim()
+        val numberLabel = number.toString().removeSuffix(".0")
+        // Newer chapters have no title, and older ones are often titled with just the number.
+        val label = title?.trim()?.takeUnless { it.isEmpty() || it == numberLabel } ?: "Capítulo $numberLabel"
+        url = "/series/$slug/capitulo/$numberLabel"
+        name = if (isVip) "🔒 $label" else label
         chapter_number = number
         date_upload = Instant.tryParse(publishedAt)
     }
