@@ -12,18 +12,6 @@ import kotlinx.serialization.json.contentOrNull
 import kotlin.time.Instant
 
 @Serializable
-class LoginRequestDto(
-    private val email: String,
-    private val password: String,
-    private val rememberMe: Boolean = true,
-)
-
-@Serializable
-class LoginResponseDto(
-    val token: String,
-)
-
-@Serializable
 class ErrorDto(
     val error: String? = null,
 )

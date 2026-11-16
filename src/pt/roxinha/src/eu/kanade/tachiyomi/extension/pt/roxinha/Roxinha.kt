@@ -1,10 +1,5 @@
 package eu.kanade.tachiyomi.extension.pt.roxinha
 
-import android.text.InputType
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceScreen
-import eu.kanade.tachiyomi.network.POST
-import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.source.model.MangasPage
 import eu.kanade.tachiyomi.source.model.Page
@@ -15,36 +10,47 @@ import keiyoushi.annotation.Source
 import keiyoushi.network.get
 import keiyoushi.network.rateLimit
 import keiyoushi.source.KeiSource
-import keiyoushi.utils.getPreferencesLazy
+import keiyoushi.utils.getLocalStorage
 import keiyoushi.utils.parseAs
 import keiyoushi.utils.toJsonElement
-import keiyoushi.utils.toJsonRequestBody
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.JsonElement
+import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
 @Source
-abstract class Roxinha :
-    KeiSource(),
-    ConfigurableSource {
-
-    private val preferences by getPreferencesLazy()
+abstract class Roxinha : KeiSource() {
 
     private val apiUrl get() = "$baseUrl/api"
+
+    private val tokenMutex = Mutex()
 
     @Volatile
     private var token: String? = null
 
     override fun OkHttpClient.Builder.configureClient(): OkHttpClient.Builder = rateLimit(4)
-        .addInterceptor(::authIntercept)
+
+    // The API only answers requests that look like they come from the site itself.
+    override fun Headers.Builder.configureHeaders(): Headers.Builder {
+        val userAgent = get("User-Agent").orEmpty()
+        val version = CHROME_REGEX.find(userAgent)?.groupValues?.get(1) ?: DEFAULT_CHROME_VERSION
+
+        return set("Sec-Fetch-Site", "same-origin")
+            .set("Sec-Fetch-Mode", "cors")
+            .set("Sec-Fetch-Dest", "empty")
+            .set("sec-ch-ua", "\"Chromium\";v=\"$version\", \"Google Chrome\";v=\"$version\", \"Not_A Brand\";v=\"24\"")
+            .set("sec-ch-ua-mobile", if ("Mobile" in userAgent) "?1" else "?0")
+    }
+
+    override fun getHomeUrl(): String = "$baseUrl/login"
 
     override suspend fun getPopularManga(page: Int): MangasPage = getSearchMangaList(page, "", FilterList(SortFilter(SortFilter.POPULAR)))
 
@@ -87,14 +93,15 @@ abstract class Roxinha :
 
     override suspend fun getPageList(chapter: SChapter): List<Page> {
         val chapterUrl = "$apiUrl/manga/chapter/${chapter.url.substringAfterLast('/')}"
-        val access = client.get("$chapterUrl/access", ensureSuccess = false)
-        if (!access.isSuccessful) throw IOException(access.errorMessage())
-        val ticket = access.parseAs<TicketDto>().ticket
-        val headers = headersBuilder().set(ACCESS_HEADER, ticket).build()
-        val response = client.get(chapterUrl, headers, ensureSuccess = false)
-        if (!response.isSuccessful) throw IOException(response.errorMessage())
+        val details = authorized { auth ->
+            val access = client.get("$chapterUrl/access", auth, ensureSuccess = false)
+            if (!access.isSuccessful) return@authorized access
+            val ticket = access.parseAs<TicketDto>().ticket
 
-        return response.parseAs<ChapterDetailsDto>().pages.mapIndexed { index, path -> Page(index, imageUrl = baseUrl + path) }
+            client.get(chapterUrl, auth.newBuilder().set(ACCESS_HEADER, ticket).build(), ensureSuccess = false)
+        }.parseAs<ChapterDetailsDto>()
+
+        return details.pages.mapIndexed { index, path -> Page(index, imageUrl = absoluteUrl(path)) }
     }
 
     override val supportsFilterFetching: Boolean get() = true
@@ -134,59 +141,37 @@ abstract class Roxinha :
 
     override fun getChapterUrl(chapter: SChapter): String = baseUrl + chapter.url
 
-    override fun setupPreferenceScreen(screen: PreferenceScreen) {
-        EditTextPreference(screen.context).apply {
-            key = EMAIL_PREF
-            title = "E-mail"
-            summary = LOGIN_HINT
-            dialogTitle = "E-mail"
-            setOnPreferenceChangeListener { _, _ ->
-                token = null
-                true
-            }
-        }.also(screen::addPreference)
-
-        EditTextPreference(screen.context).apply {
-            key = PASSWORD_PREF
-            title = "Senha"
-            summary = LOGIN_HINT
-            dialogTitle = "Senha"
-            setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD }
-            setOnPreferenceChangeListener { _, _ ->
-                token = null
-                true
-            }
-        }.also(screen::addPreference)
-    }
-
-    private fun authIntercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        if (!request.url.encodedPath.startsWith(API_PATH)) return chain.proceed(request)
-        val current = login() ?: return chain.proceed(request)
-        val response = chain.proceed(request.withToken(current))
-        if (response.code != 401) return response
-
-        response.close()
-        token = null
-        val renewed = login() ?: return chain.proceed(request)
-
-        return chain.proceed(request.withToken(renewed))
-    }
-
-    private fun Request.withToken(value: String): Request = newBuilder().header("Authorization", "Bearer $value").build()
-
-    @Synchronized
-    private fun login(): String? {
-        token?.let { return it }
-        val email = preferences.getString(EMAIL_PREF, "").orEmpty().trim()
-        val password = preferences.getString(PASSWORD_PREF, "").orEmpty()
-        if (email.isEmpty() || password.isEmpty()) return null
-
-        val body = LoginRequestDto(email, password).toJsonRequestBody()
-        val response = network.client.newCall(POST("$apiUrl/auth/login", headers, body)).execute()
+    // Login is protected by Turnstile, so the session comes from the site opened in the WebView.
+    private suspend fun authorized(request: suspend (Headers) -> Response): Response {
+        val cached = token
+        var response = request(authHeaders())
+        if (response.code == 401 && cached != null) {
+            response.close()
+            response = request(authHeaders(refresh = true))
+        }
+        if (response.code == 401) token = null
         if (!response.isSuccessful) throw IOException(response.errorMessage())
 
-        return response.parseAs<LoginResponseDto>().token.also { token = it }
+        return response
+    }
+
+    private suspend fun authHeaders(refresh: Boolean = false): Headers {
+        val current = tokenMutex.withLock {
+            if (refresh || token == null) {
+                token = getLocalStorage(baseUrl, TOKEN_KEY)?.trim()?.takeIf(String::isNotEmpty)
+            }
+            token
+        }
+
+        return headers.newBuilder()
+            .apply { current?.let { set("Authorization", "Bearer $it") } }
+            .build()
+    }
+
+    private fun absoluteUrl(path: String): String = when {
+        path.startsWith("http") -> path
+        path.startsWith("/") -> baseUrl + path
+        else -> "$baseUrl/$path"
     }
 
     private fun Response.errorMessage(): String = use {
@@ -203,11 +188,11 @@ abstract class Roxinha :
         private const val PAGE_SIZE = 24
         private const val NOVEL_TYPE = "Novel"
         private const val MANGA_PATH = "manga"
-        private const val API_PATH = "/api/"
-        private const val ACCESS_HEADER = "x-chapter-access"
-        private const val EMAIL_PREF = "email"
-        private const val PASSWORD_PREF = "password"
-        private const val LOGIN_HINT = "Informe o e-mail e a senha da sua conta da Roxinha nas configurações da extensão para ler os capítulos"
+        private const val ACCESS_HEADER = "X-Chapter-Access"
+        private const val TOKEN_KEY = "token"
+        private const val DEFAULT_CHROME_VERSION = "131"
+        private const val LOGIN_HINT = "Abra a Roxinha na WebView, faça login na sua conta e tente de novo"
+        private val CHROME_REGEX = Regex("""Chrome/(\d+)""")
         private val GENRE_MODES = listOf("default", "hentai")
         private val DEFAULT_TYPES = listOf("Manga", "Manhua", "Manhwa", "Webtoon", "Hentai", "Pornhwa", "Yaoi", "Yuri", "Shoujo", "Oneshot")
     }
